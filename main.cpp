@@ -5,50 +5,9 @@
 #include <ctime>
 #include <algorithm>
 #include <cmath>
+#include "graph.h"
 
 #define NIL -1
-
-
-Graph create_random_graph(int number_of_edges){
-
-    // number of vertexes when every vertex joins with all others vertexes
-    int min_number_of_vertexes = (1 + (int) ceil(sqrt(1 + 8.0 * number_of_edges))) / 2;
-
-    // number of vertexes when graph is a chain
-    int max_number_of_vertexes = number_of_edges + 1;
-
-    // number of vertexes is somewhere between max and min values
-    int number_of_vertexes = min_number_of_vertexes + rand() % (max_number_of_vertexes - min_number_of_vertexes + 1);
-    int number_of_added_vertexes = 0;
-
-    Graph graph(number_of_vertexes);
-    for (int v = 0; v < number_of_vertexes; v++){
-        for (int w = 0; w < number_of_vertexes; w++){
-            if (v != w && rand() % number_of_vertexes >= number_of_added_vertexes){
-                graph.add_edge(v, w);
-                number_of_added_vertexes++;
-            }
-            if (number_of_added_vertexes == number_of_vertexes){
-                return graph;
-            }
-        }
-    }
-
-    if (number_of_added_vertexes != number_of_vertexes){
-        for (int v = 0; v < number_of_vertexes; v++){
-            for (int w = 0; w < number_of_vertexes; w++){
-                if (!graph.edge_is_in_graph(v, w)){
-                    graph.add_edge(v, w);
-                    number_of_added_vertexes++;
-                }
-                if (number_of_added_vertexes == number_of_vertexes){
-                    return graph;
-                }
-            }
-        }
-    }
-    return graph;
-}
 
 
 // Driver program to test above function
@@ -69,14 +28,14 @@ int main()
     g1.add_edge(2, 1);
     g1.add_edge(0, 3);
     g1.add_edge(3, 4);
-    g1.bridge();
+    g1.find_bridges();
 
     std::cout << "\nBridges in second graph \n";
     Graph g2(4);
     g2.add_edge(0, 1);
     g2.add_edge(1, 2);
     g2.add_edge(2, 3);
-    g2.bridge();
+    g2.find_bridges();
 
     std::cout << "\nBridges in third graph \n";
     Graph g3(7);
@@ -88,7 +47,7 @@ int main()
     g3.add_edge(1, 6);
     g3.add_edge(3, 5);
     g3.add_edge(4, 5);
-    g3.bridge();
+    g3.find_bridges();
 
     return 0;
 }

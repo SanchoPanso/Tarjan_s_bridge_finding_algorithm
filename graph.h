@@ -1,11 +1,18 @@
 #ifndef TARJAN_S_BRIDGE_FINDING_ALGORITHM_GRAPH_H
 #define TARJAN_S_BRIDGE_FINDING_ALGORITHM_GRAPH_H
 
+#include <vector>
+
 // A class that represents an undirected graph
 class Graph{
+private:
     int V;    // No. of vertices
-    std::vector<std::vector<int>> adj; // A dynamic array of adjacency lists
-    void bridgeUtil(int u, bool visited[], int disc[], int low[], int parent[]);
+    std::vector<std::vector<int>> adj; // adjacency vector
+    void bridge_dfs(int u,
+                    std::vector<bool> &visited,
+                    std::vector<int> &disc,
+                    std::vector<int> &low,
+                    std::vector<int> &parent);
 public:
     Graph();
     explicit Graph(int V);
@@ -13,7 +20,9 @@ public:
     void add_edge(int v, int w);
     int get_number_of_edges();
     bool edge_is_in_graph(int v, int w);
-    void bridge();// prints all bridges
+    void find_bridges();
 };
+
+Graph create_random_graph(int number_of_edges);
 
 #endif

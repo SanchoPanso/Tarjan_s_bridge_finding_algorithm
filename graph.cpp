@@ -47,9 +47,11 @@ bool Graph::edge_is_in_graph(int v, int w){
 // visited[] --> keeps track of visited vertices
 // disc[] --> Stores discovery times of visited vertices
 // parent[] --> Stores parent vertices in DFS tree
-void Graph::bridgeUtil(int u, bool visited[], int disc[],
-                       int low[], int parent[])
-{
+void Graph::bridge_dfs(int u,
+                       std::vector<bool> &visited,
+                       std::vector<int> &disc,
+                       std::vector<int> &low,
+                       std::vector<int> &parent){
     // A static variable is used for simplicity, we can
     // avoid use of static variable by passing a pointer.
     static int time = 0;
@@ -61,16 +63,15 @@ void Graph::bridgeUtil(int u, bool visited[], int disc[],
     disc[u] = low[u] = ++time;
 
     // Go through all vertices adjacent to this
-    std::vector<int>::iterator i;
-    for (i = adj[u].begin(); i != adj[u].end(); ++i)
+    for (auto it = adj[u].begin(); it != adj[u].end(); ++it)
     {
-        int v = *i;  // v is current adjacent of u
+        int v = *it;  // v is current adjacent of u
 
         // If v is not visited yet, then recur for it
         if (!visited[v])
         {
             parent[v] = u;
-            bridgeUtil(v, visited, disc, low, parent);
+            bridge_dfs(v, visited, disc, low, parent);
 
             // Check if the subtree rooted with v has a
             // connection to one of the ancestors of u
@@ -78,7 +79,7 @@ void Graph::bridgeUtil(int u, bool visited[], int disc[],
 
             // If the lowest vertex reachable from subtree
             // under v is  below u in DFS tree, then u-v
-            // is a bridge
+            // is a find_bridges
             if (low[v] > disc[u])
                 std::cout << u <<" " << v << std::endl;
         }
@@ -90,14 +91,14 @@ void Graph::bridgeUtil(int u, bool visited[], int disc[],
 }
 
 // DFS based function to find all bridges. It uses recursive
-// function bridgeUtil()
-void Graph::bridge()
+// function bridge_dfs()
+void Graph::find_bridges()
 {
     // Mark all the vertices as not visited
-    bool *visited = new bool[V];
-    int *disc = new int[V];
-    int *low = new int[V];
-    int *parent = new int[V];
+    std::vector<bool> visited(V);
+    std::vector<int> disc(V);
+    std::vector<int> low(V);
+    std::vector<int> parent(V);
 
     // Initialize parent and visited arrays
     for (int i = 0; i < V; i++)
@@ -109,6 +110,48 @@ void Graph::bridge()
     // Call the recursive helper function to find Bridges
     // in DFS tree rooted with vertex 'i'
     for (int i = 0; i < V; i++)
-        if (visited[i] == false)
-            bridgeUtil(i, visited, disc, low, parent);
+        if (!visited[i])
+            bridge_dfs(i, visited, disc, low, parent);
+}
+
+
+Graph create_random_graph(int number_of_edges){
+
+    // number of vertexes when every vertex joins with all others vertexes
+    int min_number_of_vertexes = (1 + (int) ceil(sqrt(1 + 8.0 * number_of_edges))) / 2;
+
+    // number of vertexes when graph is a chain
+    int max_number_of_vertexes = number_of_edges + 1;
+
+    // number of vertexes is somewhere between max and min values
+    int number_of_vertexes = min_number_of_vertexes + rand() % (max_number_of_vertexes - min_number_of_vertexes + 1);
+    int number_of_added_vertexes = 0;
+
+    Graph graph(number_of_vertexes);
+    for (int v = 0; v < number_of_vertexes; v++){
+        for (int w = 0; w < number_of_vertexes; w++){
+            if (v != w && rand() % number_of_vertexes >= number_of_added_vertexes){
+                graph.add_edge(v, w);
+                number_of_added_vertexes++;
+            }
+            if (number_of_added_vertexes == number_of_vertexes){
+                return graph;
+            }
+        }
+    }
+
+    if (number_of_added_vertexes != number_of_vertexes){
+        for (int v = 0; v < number_of_vertexes; v++){
+            for (int w = 0; w < number_of_vertexes; w++){
+                if (!graph.edge_is_in_graph(v, w)){
+                    graph.add_edge(v, w);
+                    number_of_added_vertexes++;
+                }
+                if (number_of_added_vertexes == number_of_vertexes){
+                    return graph;
+                }
+            }
+        }
+    }
+    return graph;
 }
